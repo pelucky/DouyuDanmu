@@ -1,0 +1,9 @@
+target/
+bin/
+lib/
+.settings/
+.checkstyle
+.classpath
+.project
+*.log
+dependency-reduced-pom.xml
