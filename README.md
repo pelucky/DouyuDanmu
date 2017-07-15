@@ -90,7 +90,7 @@ mvn clean package
 cd target
 Linux start:sh run.sh start
 Linux Stop:sh run.sh stop
-Windows
+Windows: java -cp danmu-0.0.1-SNAPSHOT.jar;.\conf com.pelucky.danmu.DanmuApp
 ```
 ## Configuration
 
