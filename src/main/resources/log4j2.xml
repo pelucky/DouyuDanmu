@@ -5,7 +5,7 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
     </Console>
-    <File name="log" fileName="danmu.log" append="true">
+    <File name="log" fileName="logs/danmu.log" append="true">
         <PatternLayout pattern="%d{HH:mm:ss.SSS} %-5level %class{36} %L %M - %msg%xEx%n"/>
      </File>
   </Appenders>
