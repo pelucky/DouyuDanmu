@@ -3,7 +3,10 @@ package com.pelucky.danmu.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigInteger;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +17,7 @@ public class DouyuProtocolMessage {
     private int[] end;
     private ByteArrayOutputStream byteArrayOutputStream;
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
-    private Logger logger = LoggerFactory.getLogger(DouyuProtocolMessage.class);
+    private static Logger logger = LoggerFactory.getLogger(DouyuProtocolMessage.class);
 
     public DouyuProtocolMessage() {
         byteArrayOutputStream = new ByteArrayOutputStream();
@@ -32,7 +35,7 @@ public class DouyuProtocolMessage {
             byteArrayOutputStream.write(i);
         for (int i : code)
             byteArrayOutputStream.write(i);
-        byteArrayOutputStream.write(content.getBytes());
+        byteArrayOutputStream.write(content.getBytes("UTF-8"));
         for (int i : end)
             byteArrayOutputStream.write(i);
         return byteArrayOutputStream.toByteArray();
@@ -61,55 +64,40 @@ public class DouyuProtocolMessage {
             int textIndex = message.indexOf("2F747874403D") / 2;
             // "/cid@="
             int textEndIndex = message.indexOf("2F636964403D") / 2;
-            String nickname = new String();
-            String text = new String();
-            // Change nickname into Chinese if need
-            for (int i = nicknameIndex + 5; i < textIndex; i++) {
-                if (receiveMsg[i] < 32 || receiveMsg[i] > 126) {
-                    try {
-                        nickname += "%" + Integer.toHexString((receiveMsg[i] & 0x000000FF) | 0xFFFFFF00).substring(6);
-                    } catch (StringIndexOutOfBoundsException e) {
-                        logger.info("String index out of range. receiveMsg: {}", receiveMsg[i]);
-                        e.printStackTrace();
-                    }
-                } else {
-                    nickname += (char) receiveMsg[i];
-                }
-            }
-            String decodedNickname = null;
-            try {
-                decodedNickname = URLDecoder.decode(nickname, "utf-8");
-            } catch (UnsupportedEncodingException e1) {
-                logger.info("Decode error! nickname: {}, {}", nickname, receiveMsg);
-                e1.printStackTrace();
-            }
-            decodedNickname = decode(decodedNickname);
 
-            // Change text into Chinese if need
-            for (int i = textIndex + 6; i < textEndIndex; i++) {
-                if (receiveMsg[i] < 32 || receiveMsg[i] > 126) {
-                    try {
-                        text += "%" + Integer.toHexString((receiveMsg[i] & 0x000000FF) | 0xFFFFFF00).substring(6);
-                    } catch (StringIndexOutOfBoundsException e) {
-                        logger.info("String index out of range. receiveMsg: {}", receiveMsg[i]);
-                        e.printStackTrace();
-                    }
-                } else {
-                    text += (char) receiveMsg[i];
-                }
-            }
-
-            String decodedText = null;
-            try {
-                decodedText = URLDecoder.decode(text, "utf-8");
-            } catch (UnsupportedEncodingException e1) {
-                logger.info("Decode error! text: {}, {}", text, receiveMsg);
-                e1.printStackTrace();
-            }
-            decodedText = decode(decodedText);
-            // logger.debug("{}: {}", decodedNickname, decodedText);
+            String nickname = changeToChinese(receiveMsg, nicknameIndex, textIndex, 5);
+            String decodedNickname = decodeMessage(nickname);
+            String text = changeToChinese(receiveMsg, textIndex, textEndIndex, 6);
+            String decodedText = decodeMessage(text);
             System.out.println(decodedNickname + ": " + decodedText);
         }
+    }
+
+
+    /**
+     *
+     * Change text into Chinese if need
+     * @param receiveMsg
+     * @param indexStart
+     * @param indexEnd
+     * @param num
+     * @return
+     */
+    private String changeToChinese(byte[] receiveMsg, int indexStart, int indexEnd, int num) {
+        String text = new String();
+        for (int i = indexStart + num; i < indexEnd; i++) {
+            if (receiveMsg[i] < 32 || receiveMsg[i] > 126) {
+                try {
+                    text += "%" + Integer.toHexString((receiveMsg[i] & 0x000000FF) | 0xFFFFFF00).substring(6);
+                } catch (StringIndexOutOfBoundsException e) {
+                    logger.info("String index out of range. receiveMsg: {}", receiveMsg[i]);
+                    logger.info(e.getMessage());
+                }
+            } else {
+                text += (char) receiveMsg[i];
+            }
+        }
+        return text;
     }
 
     public static String bytesToHex(byte[] bytes) {
@@ -122,7 +110,33 @@ public class DouyuProtocolMessage {
         return new String(hexChars);
     }
 
-    public String encode(String str) {
+    public static String encodeMessage(String message) {
+        message = encode(message);
+//        try {
+//            message = URLEncoder.encode(message, "utf-8");
+//        } catch (UnsupportedEncodingException e1) {
+//            logger.info("Encode error! message: {}", message);
+//            logger.info(e1.getMessage());
+//        }
+        message = message.replace("%", "");
+        //byte[] messageBytes = new BigInteger(message, 16).toByteArray();
+        //return Arrays.copyOfRange(messageBytes, 1, messageBytes.length);
+        return message;
+    }
+
+    private String decodeMessage(String message) {
+        String decodedMessage = null;
+        try {
+            decodedMessage = URLDecoder.decode(message, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.info("Decode error! message: {}", message);
+            logger.info(e.getMessage());
+        }
+        decodedMessage = decode(decodedMessage);
+        return decodedMessage;
+    }
+
+    public static String encode(String str) {
         return str.replace("@", "@A").replace("/", "@S");
     }
 

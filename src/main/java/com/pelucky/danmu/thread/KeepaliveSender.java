@@ -1,7 +1,5 @@
 package com.pelucky.danmu.thread;
 
-import java.io.IOException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,13 +16,8 @@ public class KeepaliveSender implements Runnable {
     @Override
     public void run() {
         while (true) {
-            try {
-                long unixTime = System.currentTimeMillis() / 1000L;
-                this.tcpSocketClient.sendData("type@=keeplive/tick@=" + unixTime + "/");
-            } catch (IOException e) {
-                logger.info("Send keepalive fail!");
-                e.printStackTrace();
-            }
+            long unixTime = System.currentTimeMillis() / 1000L;
+            this.tcpSocketClient.sendData("type@=keeplive/tick@=" + unixTime + "/");
             try {
                 Thread.sleep(40000);
             } catch (InterruptedException e) {

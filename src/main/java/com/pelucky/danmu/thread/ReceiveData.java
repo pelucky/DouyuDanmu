@@ -19,33 +19,25 @@ public class ReceiveData implements Runnable {
 
     @Override
     public void run() {
-        while(true){
+        while (true) {
             try {
                 ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
                 InputStream inputStream = tcpSocketClient.getSocket().getInputStream();
 
-                // int length = 0;
-                // length = inputStream.read();
-                // byteOutput.write(length);
-                // System.out.println("msg length:" + length);
-
-                // byte[] msg = new byte[length + 3];
                 byte[] msg = new byte[1024];
-
-                int line;
+                int line = 0;
                 line = inputStream.read(msg);
                 byteOutput.write(msg, 0, line);
                 byte[] receiveMsg = byteOutput.toByteArray();
                 tcpSocketClient.getDouyuProtocolMessage().receivedMessageContent(receiveMsg);
 
-                // for (byte b : receiveMsg) {
-                // System.out.print((char) b);
-                // }
-                // System.out.println();
-
+//                for (byte b : receiveMsg) {
+//                    System.out.print(b);
+//                }
+//                System.out.println();
             } catch (IOException e) {
                 logger.info("Receive IO error!");
-                e.printStackTrace();
+                logger.info(e.getMessage());
             }
         }
     }

@@ -24,7 +24,7 @@ public class TcpSocketClient {
             logger.info("Open Socket successfully");
         } catch (IOException e) {
             logger.info("Open socket fail");
-            e.printStackTrace();
+            logger.info(e.getMessage());
         }
         douyuProtocolMessage = new DouyuProtocolMessage();
     }
@@ -41,17 +41,22 @@ public class TcpSocketClient {
         try {
             socket.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
         }
     }
 
-    public void sendData(String content) throws IOException {
-        byte[] messageContent = douyuProtocolMessage.sendMessageContent(content);
+    public void sendData(String content) {
+        byte[] messageContent = null;
+        try {
+            messageContent = douyuProtocolMessage.sendMessageContent(content);
+        } catch (IOException e1) {
+            logger.info(e1.getMessage());
+        }
         try {
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(messageContent);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
         }
     }
 }
