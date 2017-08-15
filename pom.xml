@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.pelucky.danmu</groupId>
 	<artifactId>danmu</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1.1-SNAPSHOT</version>
 	<name>Danmu</name>
 	<description>Grap danmu from DouyuTV</description>
 	<build>

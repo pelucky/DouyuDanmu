@@ -3,10 +3,7 @@ package com.pelucky.danmu.util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +38,16 @@ public class DouyuProtocolMessage {
         return byteArrayOutputStream.toByteArray();
     }
 
-    private int calcMessageLength(String content) {
-        return 4 + 4 + (content == null ? 0 : content.length()) + 1;
+    /**
+     *
+     * Be careful about the length of content, because Chinese's char is not 1 length,
+     * so you should encode it first.
+     * @param content
+     * @return
+     * @throws UnsupportedEncodingException
+     */
+    private int calcMessageLength(String content) throws UnsupportedEncodingException {
+        return 4 + 4 + (content == null ? 0 : content.getBytes("UTF-8").length) + 1;
     }
 
     public void receivedMessageContent(byte[] receiveMsg) {
@@ -73,10 +78,10 @@ public class DouyuProtocolMessage {
         }
     }
 
-
     /**
      *
      * Change text into Chinese if need
+     *
      * @param receiveMsg
      * @param indexStart
      * @param indexEnd
@@ -112,20 +117,17 @@ public class DouyuProtocolMessage {
 
     public static String encodeMessage(String message) {
         message = encode(message);
-//        try {
-//            message = URLEncoder.encode(message, "utf-8");
-//        } catch (UnsupportedEncodingException e1) {
-//            logger.info("Encode error! message: {}", message);
-//            logger.info(e1.getMessage());
-//        }
-        message = message.replace("%", "");
-        //byte[] messageBytes = new BigInteger(message, 16).toByteArray();
-        //return Arrays.copyOfRange(messageBytes, 1, messageBytes.length);
         return message;
     }
 
+    /**
+     * @TODO: if '%' is in message, decode will fail
+     *
+     * @param message
+     * @return
+     */
     private String decodeMessage(String message) {
-        String decodedMessage = null;
+        String decodedMessage = message;
         try {
             decodedMessage = URLDecoder.decode(message, "utf-8");
         } catch (UnsupportedEncodingException e) {

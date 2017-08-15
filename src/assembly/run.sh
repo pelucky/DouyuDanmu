@@ -3,7 +3,7 @@
 mkdir -p logs
 JVM_OPTS='-XX:+TieredCompilation -Xmx1024m -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:logs/gc.log -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=1 -XX:GCLogFileSize=100M -Dfile.encoding=UTF-8'
 
-CLASS_PATH="danmu-0.0.1-SNAPSHOT.jar":./conf
+CLASS_PATH="danmu-0.1.1-SNAPSHOT.jar":./conf
 
 case $1 in
 start)

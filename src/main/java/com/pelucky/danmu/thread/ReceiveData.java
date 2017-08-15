@@ -24,17 +24,12 @@ public class ReceiveData implements Runnable {
                 ByteArrayOutputStream byteOutput = new ByteArrayOutputStream();
                 InputStream inputStream = tcpSocketClient.getSocket().getInputStream();
 
-                byte[] msg = new byte[1024];
+                byte[] msg = new byte[10240];
                 int line = 0;
                 line = inputStream.read(msg);
                 byteOutput.write(msg, 0, line);
                 byte[] receiveMsg = byteOutput.toByteArray();
                 tcpSocketClient.getDouyuProtocolMessage().receivedMessageContent(receiveMsg);
-
-//                for (byte b : receiveMsg) {
-//                    System.out.print(b);
-//                }
-//                System.out.println();
             } catch (IOException e) {
                 logger.info("Receive IO error!");
                 logger.info(e.getMessage());
