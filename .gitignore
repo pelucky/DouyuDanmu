@@ -7,3 +7,4 @@ lib/
 .project
 *.log
 dependency-reduced-pom.xml
+config.properties
